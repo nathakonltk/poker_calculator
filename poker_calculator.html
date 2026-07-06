@@ -6,40 +6,66 @@
     <title>Poker Texas Hold'em Odds Calculator</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #1a252f; color: #ffffff; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 850px; background-color: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-        h1 { text-align: center; margin-top: 0; color: #1abc9c; font-size: 24px; }
-        .display-panel { background-color: #34495e; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #1abc9c; }
-        .display-row { margin-bottom: 10px; font-size: 16px; }
+        body { background-color: #1a252f; color: #ffffff; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 850px; background-color: #2c3e50; padding: 20px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        h1 { text-align: center; margin-top: 0; color: #1abc9c; font-size: 22px; margin-bottom: 15px; }
+        
+        /* แผงแสดงผลสไตล์มินิมอล */
+        .display-panel { background-color: #34495e; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #1abc9c; }
+        .display-row { margin-bottom: 12px; display: flex; align-items: center; gap: 15px; justify-content: space-between; flex-wrap: wrap; }
         .display-row:last-child { margin-bottom: 0; }
-        .label { font-weight: bold; color: #bdc3c7; display: inline-block; width: 120px; }
-        .val-box { display: inline-block; background-color: #2c3e50; padding: 5px 10px; border-radius: 5px; min-width: 150px; text-align: center; font-weight: bold; letter-spacing: 1px; }
-        #status-val { color: #f1c40f; }
-        #hand-val { color: #2ecc71; }
-        #board-val { color: #3498db; }
-        #result-val { color: #e74c3c; font-size: 18px; min-width: 250px; }
-        .control-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
-        .btn { padding: 10px 5px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.2s; width: 30%;}
+        .label { font-weight: bold; color: #bdc3c7; font-size: 14px; min-width: 160px; }
+        
+        /* สไตล์มินิการ์ด (Mini Cards) แบบกะทัดรัดดูง่าย */
+        .card-slots { display: flex; gap: 6px; align-items: center; }
+        .mini-live-card { background: white; color: black; font-weight: bold; padding: 4px 8px; border-radius: 5px; font-size: 14px; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); animation: popIn 0.15s ease-out; min-width: 42px; justify-content: center; }
+        .empty-mini-slot { border: 1.5px dashed #4f5f6f; background-color: rgba(44, 62, 80, 0.4); padding: 4px 8px; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #5d6d7e; font-size: 12px; font-weight: bold; min-width: 42px; text-align: center; }
+        
+        .result-container { margin-top: 10px; border-top: 1px solid #4f5f6f; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .val-box { background-color: #2c3e50; padding: 6px 12px; border-radius: 5px; font-weight: bold; letter-spacing: 0.5px; color: #e74c3c; font-size: 16px; }
+        #status-val { color: #f1c40f; background: #2c3e50; padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 12px; }
+        
+        /* แผงวิเคราะห์ไพ่ที่ชนะเรา */
+        .analysis-panel { background-color: #2c3e50; border: 1px solid #e74c3c; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: none; }
+        .analysis-title { color: #e74c3c; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .analysis-list { display: flex; flex-direction: column; gap: 6px; }
+        .analysis-item { display: flex; align-items: center; background: #34495e; padding: 6px 12px; border-radius: 6px; justify-content: space-between; font-size: 14px; }
+        .hand-name { font-weight: bold; color: #f1c40f; }
+        .example-cards { display: flex; gap: 5px; }
+        .mini-card { background: white; color: black; font-weight: bold; padding: 3px 6px; border-radius: 4px; font-size: 13px; display: flex; align-items: center; gap: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* ปุ่มควบคุม */
+        .control-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: center; }
+        .btn { padding: 8px 5px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 14px; width: 32%; }
         .btn-mode { background-color: #95a5a6; color: #fff; }
         .btn-mode.active { background-color: #1abc9c; }
-        .btn-calc { background-color: #e67e22; color: #fff; flex-grow: 1; font-size: 16px; }
+        .btn-calc { background-color: #e67e22; color: #fff; flex-grow: 1; font-size: 15px; padding: 10px; }
         .btn-calc:hover { background-color: #d35400; }
         .btn-reset { background-color: #95a5a6; color: #fff; }
         .btn-reset:hover { background-color: #7f8c8d; }
-        .opp-group-container { display: flex; gap: 5px; flex-wrap: wrap; background-color: #34495e; padding: 10px; border-radius: 8px; width: 100%; }
-        .btn-opp { flex: 1; min-width: 60px; background-color: #2c3e50; color: #fff; padding: 8px 5px; font-size: 13px; }
+        
+        .opp-group-container { display: flex; gap: 5px; flex-wrap: wrap; background-color: #34495e; padding: 8px; border-radius: 8px; width: 100%; }
+        .btn-opp { flex: 1; min-width: 55px; background-color: #2c3e50; color: #fff; padding: 6px 4px; font-size: 12px; }
         .btn-opp.active { background-color: #e67e22; color: white; }
-        .deck-container { background-color: #34495e; padding: 15px; border-radius: 10px; }
-        .suit-row { display: flex; gap: 5px; margin-bottom: 10px; justify-content: space-between; }
+        
+        /* แผงปุ่มเลือกไพ่ด้านล่าง */
+        .deck-container { background-color: #34495e; padding: 12px; border-radius: 10px; }
+        .suit-row { display: flex; gap: 4px; margin-bottom: 8px; justify-content: space-between; }
         .suit-row:last-child { margin-bottom: 0; }
-        .card-btn { flex: 1; height: 55px; border: none; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; background-color: #fff; transition: all 0.1s; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); overflow: hidden; }
+        .card-btn { flex: 1; height: 48px; border: none; border-radius: 4px; font-weight: bold; font-size: 13px; cursor: pointer; background-color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); overflow: hidden; }
         .card-btn div { line-height: 1.1; }
-        .card-btn:disabled { background-color: #555 !important; color: #888 !important; cursor: not-allowed; box-shadow: none; transform: none !important; }
-        .card-btn:active { transform: scale(0.95); }
+        .card-btn:disabled { background-color: #555 !important; color: #888 !important; cursor: not-allowed; box-shadow: none; }
+        
+        /* สีประจำดอกไพ่ */
         .suit-s { color: #000000; }
         .suit-h { color: #e74c3c; }
         .suit-d { color: #3498db; }
         .suit-c { color: #27ae60; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -48,19 +74,48 @@
     <h1>Poker Texas Hold'em Calculator</h1>
     
     <div class="display-panel">
-        <div class="display-row"><span class="label">สถานะปัจจุบัน:</span><span id="status-val" class="val-box">ไพ่ในมือ</span></div>
-        <div class="display-row"><span class="label">ไพ่ในมือ (2 ใบ):</span><span id="hand-val" class="val-box">-</span></div>
-        <div class="display-row"><span class="label">ไพ่กองกลาง:</span><span id="board-val" class="val-box">-</span></div>
-        <div class="display-row" style="margin-top: 15px; border-top: 1px solid #4f5f6f; padding-top: 10px;"><span class="label">ผลการคำนวณ:</span><span id="result-val" class="val-box">-</span></div>
+        <div id="status-val">โหมดปัจจุบัน: เลือกไพ่ในมือ</div>
+        
+        <!-- ส่วนแสดงไพ่ในมือสไตล์มินิการ์ด -->
+        <div class="display-row">
+            <span class="label">ไพ่ในมือของคุณ (2 ใบ):</span>
+            <div class="card-slots" id="hand-slots">
+                <div class="empty-mini-slot">?</div>
+                <div class="empty-mini-slot">?</div>
+            </div>
+        </div>
+        
+        <!-- ส่วนแสดงไพ่กองกลางสไตล์มินิการ์ด -->
+        <div class="display-row">
+            <span class="label">ไพ่กองกลาง (Community):</span>
+            <div class="card-slots" id="board-slots">
+                <div class="empty-mini-slot">Flop</div>
+                <div class="empty-mini-slot">Flop</div>
+                <div class="empty-mini-slot">Flop</div>
+                <div class="empty-mini-slot">Turn</div>
+                <div class="empty-mini-slot">River</div>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <span class="label">ผลคำนวณโอกาสชนะ:</span>
+            <span id="result-val" class="val-box">-</span>
+        </div>
+    </div>
+
+    <!-- แผงแสดงไพ่ที่สามารถชนะเราได้ (Top 3) -->
+    <div class="analysis-panel" id="analysis-panel">
+        <div class="analysis-title">⚠️ รูปแบบไพ่ที่เหนือกว่าเรา ณ ตอนนี้ (3 อันดับสูงสุดที่คู่ต่อสู้อาจถือ):</div>
+        <div class="analysis-list" id="analysis-list"></div>
     </div>
 
     <div class="control-row">
-        <button id="btn-mode-hand" class="btn btn-mode active" onclick="switchMode('hand')">ไพ่ในมือ</button>
-        <button id="btn-mode-board" class="btn btn-mode" onclick="switchMode('board')">ไพ่กองกลาง</button>
+        <button id="btn-mode-hand" class="btn btn-mode active" onclick="switchMode('hand')">เลือกไพ่ในมือ</button>
+        <button id="btn-mode-board" class="btn btn-mode" onclick="switchMode('board')">เลือกไพ่กองกลาง</button>
         <button class="btn btn-reset" style="margin-left: auto;" onclick="resetAll()">เริ่มใหม่</button>
     </div>
 
-    <div style="margin-bottom: 10px; font-size: 14px; font-weight: bold; color: #bdc3c7;">เลือกจำนวนคู่ต่อสู้:</div>
+    <div style="margin-bottom: 8px; font-size: 13px; font-weight: bold; color: #bdc3c7;">เลือกจำนวนคู่ต่อสู้:</div>
     <div class="control-row">
         <div class="opp-group-container" id="opponent-btn-container"></div>
     </div>
@@ -85,6 +140,15 @@
         { code: 'd', symbol: '♦', name: 'suit-d' },
         { code: 'c', symbol: '♣', name: 'suit-c' }
     ];
+    
+    const suitSymbols = {'s':'♠','h':'♥','d':'♦','c':'♣'};
+    const suitClasses = {'s':'suit-s','h':'suit-h','d':'suit-d','c':'suit-c'};
+    
+    const handRankNames = [
+        "High Card (ไพ่สูง)", "One Pair (1 คู่)", "Two Pair (2 คู่)", 
+        "Three of a Kind (ตอง)", "Straight (เรียง)", "Flush (สี)", 
+        "Full House (เห่า)", "Four of a Kind (ฟอร์การ์ด)", "Straight Flush (สเตรทฟลัช)"
+    ];
 
     function createDeck() {
         const container = document.getElementById('deck-container');
@@ -96,7 +160,7 @@
                 const btn = document.createElement('button');
                 btn.className = `card-btn ${suit.name}`;
                 btn.id = `card-${rank}${suit.code}`;
-                btn.innerHTML = `<div>${rank}</div><div style="font-size:16px;">${suit.symbol}</div>`;
+                btn.innerHTML = `<div>${rank}</div><div style="font-size:14px;">${suit.symbol}</div>`;
                 btn.onclick = () => clickCard(`${rank}${suit.code}`);
                 row.appendChild(btn);
             });
@@ -125,11 +189,12 @@
 
     function switchMode(mode) {
         currentMode = mode;
-        document.getElementById('status-val').innerText = mode === 'hand' ? 'ไพ่ในมือ' : 'ไพ่กองกลาง';
+        document.getElementById('status-val').innerText = mode === 'hand' ? 'โหมดปัจจุบัน: เลือกไพ่ในมือ' : 'โหมดปัจจุบัน: เลือกไพ่กองกลาง';
         document.getElementById('btn-mode-hand').classList.toggle('active', mode === 'hand');
         document.getElementById('btn-mode-board').classList.toggle('active', mode === 'board');
         if (mode === 'hand') { selectedHand = []; } else if (mode === 'board') { selectedBoard = []; }
         updateDisplay();
+        analyzeWhatBeatsMe();
     }
 
     function clickCard(cardCode) {
@@ -147,11 +212,43 @@
             if (selectedBoard.length < 5) { selectedBoard.push(cardCode); }
         }
         updateDisplay();
+        analyzeWhatBeatsMe();
     }
 
     function updateDisplay() {
-        document.getElementById('hand-val').innerText = selectedHand.length > 0 ? selectedHand.join(' ') : '-';
-        document.getElementById('board-val').innerText = selectedBoard.length > 0 ? selectedBoard.join(' ') : '-';
+        // วาดมินิการ์ดสำหรับไพ่ในมือ
+        const handSlots = document.getElementById('hand-slots');
+        handSlots.innerHTML = '';
+        for (let i = 0; i < 2; i++) {
+            if (selectedHand[i]) {
+                let rank = selectedHand[i][0];
+                let suit = selectedHand[i][1];
+                handSlots.innerHTML += `
+                    <div class="mini-live-card ${suitClasses[suit]}">
+                        ${rank} ${suitSymbols[suit]}
+                    </div>`;
+            } else {
+                handSlots.innerHTML += `<div class="empty-mini-slot">?</div>`;
+            }
+        }
+
+        // วาดมินิการ์ดสำหรับไพ่กองกลาง
+        const boardSlots = document.getElementById('board-slots');
+        boardSlots.innerHTML = '';
+        const boardLabels = ['F1', 'F2', 'F3', 'Turn', 'River'];
+        for (let i = 0; i < 5; i++) {
+            if (selectedBoard[i]) {
+                let rank = selectedBoard[i][0];
+                let suit = selectedBoard[i][1];
+                boardSlots.innerHTML += `
+                    <div class="mini-live-card ${suitClasses[suit]}">
+                        ${rank} ${suitSymbols[suit]}
+                    </div>`;
+            } else {
+                boardSlots.innerHTML += `<div class="empty-mini-slot">${boardLabels[i]}</div>`;
+            }
+        }
+
         const allCards = document.querySelectorAll('.card-btn');
         allCards.forEach(btn => btn.disabled = false);
         selectedHand.forEach(card => { const btn = document.getElementById(`card-${card}`); if (btn) btn.disabled = true; });
@@ -161,7 +258,141 @@
     function resetAll() {
         selectedHand = []; selectedBoard = [];
         document.getElementById('result-val').innerText = '-';
+        document.getElementById('analysis-panel').style.display = 'none';
         setOpponents(5); switchMode('hand');
+    }
+
+    function analyzeWhatBeatsMe() {
+        const panel = document.getElementById('analysis-panel');
+        const listContainer = document.getElementById('analysis-list');
+        
+        if (selectedHand.length !== 2 || (selectedBoard.length !== 4 && selectedBoard.length !== 5)) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        const deadCards = [...selectedHand, ...selectedBoard];
+        const allSuits = ['s', 'h', 'd', 'c'];
+        const allRanks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
+        
+        let fullDeck = [];
+        for (let r of allRanks) {
+            for (let s of allSuits) { fullDeck.push(r + s); }
+        }
+        let remainingDeck = fullDeck.filter(card => !deadCards.includes(card));
+        
+        let myCurrentScore = evaluate7CardHand([...selectedHand, ...selectedBoard]);
+        let combinationsThatBeatMe = [];
+        let seenHandTypes = new Set();
+
+        for (let i = 0; i < remainingDeck.length; i++) {
+            for (let j = i + 1; j < remainingDeck.length; j++) {
+                let oppHand = [remainingDeck[i], remainingDeck[j]];
+                let oppScoreData = evaluate7CardHandWithDetails([...oppHand, ...selectedBoard]);
+
+                if (oppScoreData.score > myCurrentScore) {
+                    let handType = oppScoreData.type;
+                    let handName = handRankNames[handType];
+                    
+                    if (handType === 8 && oppScoreData.highCard === 14) {
+                        handName = "Royal Straight Flush (รอยัลสเตรทฟลัช)";
+                    }
+
+                    if (!seenHandTypes.has(handName)) {
+                        seenHandTypes.add(handName);
+                        combinationsThatBeatMe.push({
+                            name: handName,
+                            type: handType,
+                            score: oppScoreData.score,
+                            cards: oppHand
+                        });
+                    }
+                }
+            }
+        }
+
+        combinationsThatBeatMe.sort((a, b) => b.score - a.score);
+        let top3 = combinationsThatBeatMe.slice(0, 3);
+
+        if (top3.length > 0) {
+            listContainer.innerHTML = '';
+            top3.forEach((item, index) => {
+                let card1 = item.cards[0];
+                let card2 = item.cards[1];
+                
+                listContainer.innerHTML += `
+                    <div class="analysis-item">
+                        <span class="hand-name">${index + 1}. ${item.name}</span>
+                        <div class="example-cards">
+                            <span style="font-size:12px; color:#bdc3c7; align-self:center; margin-right:5px;">ถ้าเขาถือ:</span>
+                            <div class="mini-card ${suitClasses[card1[1]]}">
+                                ${card1[0]} ${suitSymbols[card1[1]]}
+                            </div>
+                            <div class="mini-card ${suitClasses[card2[1]]}">
+                                ${card2[0]} ${suitSymbols[card2[1]]}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            panel.style.display = 'block';
+        } else {
+            listContainer.innerHTML = '<div class="analysis-item" style="color:#2ecc71; font-weight:bold; justify-content:center;">คุณถือไพ่ที่ดีที่สุดในบอร์ดนี้แล้ว (The Nuts)! ไม่มีไพ่ใดชนะคุณได้</div>';
+            panel.style.display = 'block';
+        }
+    }
+
+    function evaluate7CardHandWithDetails(cards) {
+        const rankValues = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+        let parsed = cards.map(c => ({ rank: rankValues[c[0]], suit: c[1] }));
+        
+        let rankCounts = {}, suitCounts = {};
+        parsed.forEach(c => {
+            rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1;
+            suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1;
+        });
+        
+        let flushSuit = Object.keys(suitCounts).find(s => suitCounts[s] >= 5);
+        let isFlush = !!flushSuit;
+        
+        let uniqueRanks = Object.keys(rankCounts).map(Number).sort((a,b) => b-a);
+        if (uniqueRanks.includes(14)) uniqueRanks.push(1);
+        
+        let isStraight = false;
+        let straightHigh = 0;
+        for (let i = 0; i <= uniqueRanks.length - 5; i++) {
+            if (uniqueRanks[i] - uniqueRanks[i+4] === 4) { isStraight = true; straightHigh = uniqueRanks[i]; break; }
+        }
+        if (!isStraight && uniqueRanks.includes(14) && uniqueRanks.includes(2) && uniqueRanks.includes(3) && uniqueRanks.includes(4) && uniqueRanks.includes(5)) {
+            isStraight = true; straightHigh = 5;
+        }
+
+        let pairs = [], trips = [], quads = [];
+        Object.keys(rankCounts).forEach(r => {
+            let count = rankCounts[r]; let val = Number(r);
+            if (count === 4) quads.push(val); else if (count === 3) trips.push(val); else if (count === 2) pairs.push(val);
+        });
+        quads.sort((a,b)=>b-a); trips.sort((a,b)=>b-a); pairs.sort((a,b)=>b-a);
+
+        let type = 0; let kickers = [];
+        if (isFlush && isStraight) { type = 8; kickers = [straightHigh]; }
+        else if (quads.length > 0) { type = 7; kickers = [quads[0]]; }
+        else if (trips.length > 0 && (trips.length > 1 || pairs.length > 0)) { type = 6; kickers = [trips[0], trips[1] || pairs[0]]; }
+        else if (isFlush) { type = 5; kickers = parsed.filter(c => c.suit === flushSuit).map(c => c.rank).sort((a,b)=>b-a).slice(0,5); }
+        else if (isStraight) { type = 4; kickers = [straightHigh]; }
+        else if (trips.length > 0) { type = 3; kickers = [trips[0]]; }
+        else if (pairs.length >= 2) { type = 2; kickers = [pairs[0], pairs[1]]; }
+        else if (pairs.length === 1) { type = 1; kickers = [pairs[0]]; }
+        else { type = 0; kickers = uniqueRanks.slice(0,5); }
+
+        let score = type * 1000000; let multiplier = 10000;
+        for (let k of kickers) { score += k * multiplier; multiplier /= 100; }
+        
+        return { score: score, type: type, highCard: straightHigh || kickers[0] };
+    }
+
+    function evaluate7CardHand(cards) {
+        return evaluate7CardHandWithDetails(cards).score;
     }
 
     function calculateOdds() {
@@ -191,40 +422,13 @@
             const percentText = (winChance * 100).toFixed(2) + "%";
             const totalPlayers = currentOpponents + 1;
             const winInPlayers = Math.round(winChance * totalPlayers);
-            document.getElementById('result-val').innerText = `${percentText} (ชนะสัดส่วน ${winInPlayers}/${totalPlayers} คนของโต๊ะ)`;
+            document.getElementById('result-val').innerText = `${percentText} (สัดส่วน ${winInPlayers}/${totalPlayers} คน)`;
         }, 50);
-    }
-
-    function evaluate7CardHand(cards) {
-        const rankValues = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
-        let parsed = cards.map(c => ({ rank: rankValues[c[0]], suit: c[1] }));
-        let rankCounts = {}, suitCounts = {};
-        parsed.forEach(c => { rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1; suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1; });
-        let flushSuit = Object.keys(suitCounts).find(s => suitCounts[s] >= 5); let isFlush = !!flushSuit;
-        let uniqueRanks = Object.keys(rankCounts).map(Number).sort((a,b) => b-a); if (uniqueRanks.includes(14)) uniqueRanks.push(1);
-        let isStraight = false; let straightHigh = 0;
-        for (let i = 0; i <= uniqueRanks.length - 5; i++) { if (uniqueRanks[i] - uniqueRanks[i+4] === 4) { isStraight = true; straightHigh = uniqueRanks[i]; break; } }
-        if (!isStraight && uniqueRanks.includes(14) && uniqueRanks.includes(2) && uniqueRanks.includes(3) && uniqueRanks.includes(4) && uniqueRanks.includes(5)) { isStraight = true; straightHigh = 5; }
-        let pairs = [], trips = [], quads = [];
-        Object.keys(rankCounts).forEach(r => { let count = rankCounts[r]; let val = Number(r); if (count === 4) quads.push(val); else if (count === 3) trips.push(val); else if (count === 2) pairs.push(val); });
-        quads.sort((a,b)=>b-a); trips.sort((a,b)=>b-a); pairs.sort((a,b)=>b-a);
-        let type = 0; let kickers = [];
-        if (isFlush && isStraight) { type = 8; kickers = [straightHigh]; }
-        else if (quads.length > 0) { type = 7; kickers = [quads[0]]; }
-        else if (trips.length > 0 && (trips.length > 1 || pairs.length > 0)) { type = 6; kickers = [trips[0], trips[1] || pairs[0]]; }
-        else if (isFlush) { type = 5; kickers = parsed.filter(c => c.suit === flushSuit).map(c => c.rank).sort((a,b)=>b-a).slice(0,5); }
-        else if (isStraight) { type = 4; kickers = [straightHigh]; }
-        else if (trips.length > 0) { type = 3; kickers = [trips[0]]; }
-        else if (pairs.length >= 2) { type = 2; kickers = [pairs[0], pairs[1]]; }
-        else if (pairs.length === 1) { type = 1; kickers = [pairs[0]]; }
-        else { type = 0; kickers = uniqueRanks.slice(0,5); }
-        let score = type * 1000000; let multiplier = 10000;
-        for (let k of kickers) { score += k * multiplier; multiplier /= 100; }
-        return score;
     }
 
     createDeck();
     createOpponentButtons();
+    updateDisplay();
 </script>
 </body>
 </html>
